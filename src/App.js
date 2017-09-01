@@ -6,13 +6,29 @@ import SearchPage from './SearchPage'
 import BookShelf from './BookShelf'
 
 class BooksApp extends React.Component {
-  state = {
-    books: []
+  constructor(props) {
+    super(props);
+    this.state = { books: [] };
+
+    this.handleUpdate = this.handleUpdate.bind(this);
   }
+
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
       this.setState({ books })
     })
+  }
+  handleUpdate(book, shelf) {
+    this.setState((state) => ({
+      books: state.books.map((b) => {
+        if (b.id === book.id) {
+          b.shelf = shelf
+        }
+        return b
+      })
+    }))
+
+    BooksAPI.update(book, shelf);
   }
   render() {
     return (
@@ -25,9 +41,9 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                <BookShelf title="Currently Reading" books={this.state.books.filter((book) => book.shelf === 'currentlyReading')} />
-                <BookShelf title="Want to Read" books={this.state.books.filter((book) => book.shelf === 'wantToRead')} />
-                <BookShelf title="Read" books={this.state.books.filter((book) => book.shelf === 'read')} />
+                <BookShelf title="Currently Reading" books={this.state.books.filter((book) => book.shelf === 'currentlyReading')} handleUpdate={this.handleUpdate} />
+                <BookShelf title="Want to Read" books={this.state.books.filter((book) => book.shelf === 'wantToRead')} handleUpdate={this.handleUpdate} />
+                <BookShelf title="Read" books={this.state.books.filter((book) => book.shelf === 'read')} handleUpdate={this.handleUpdate} />
               </div>
             </div>
             <div className="open-search">
